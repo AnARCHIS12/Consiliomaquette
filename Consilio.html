@@ -1,0 +1,816 @@
+<html><head><base href="https://app.consilio.org/">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Consilio - L'Union Communiste en Action</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary-color: #D32F2F;
+    --secondary-color: #FFEB3B;
+    --background-color: #1E1E1E;
+    --text-color: #FFFFFF;
+    --card-bg: #2C2C2C;
+    --accent-color: #FFD700;
+  }
+  
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+  }
+  
+  .app-container {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  
+  header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.5rem;
+    text-align: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  }
+  
+  header h1 {
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  
+  main {
+    margin-top: 0;
+    padding-top: 50px; /* Adjust based on the new header height */
+    padding-bottom: 70px;
+  }
+  
+  #map {
+    width: 100%;
+    height: 100vh;
+    margin-bottom: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  
+  #councils, #chat, #profile, #revolution {
+    display: none;
+  }
+  
+  .card {
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 5px rgba(255,255,255,0.1);
+  }
+  
+  .council-card h2 {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    color: var(--accent-color);
+  }
+  
+  .council-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1rem;
+    color: #f0f0f0;
+    margin-bottom: 1rem;
+  }
+  
+  .action-buttons {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  button {
+    background-color: var(--secondary-color);
+    border: none;
+    color: var(--background-color);
+    padding: 0.75rem 1.5rem;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1rem;
+    margin: 0.25rem 0;
+    cursor: pointer;
+    border-radius: 20px;
+    transition: background-color 0.3s, transform 0.2s;
+    font-weight: bold;
+  }
+  
+  button:hover {
+    background-color: var(--accent-color);
+    transform: scale(1.05);
+  }
+  
+  #chatMessages {
+    height: 40vh;
+    overflow-y: auto;
+    border: 1px solid #444;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border-radius: 10px;
+    background-color: rgba(255,255,255,0.05);
+    font-size: 1rem;
+    color: #f0f0f0;
+  }
+  
+  #chatInput {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #444;
+    border-radius: 20px;
+    font-size: 1.1rem;
+    background-color: rgba(255,255,255,0.1);
+    color: var(--text-color);
+  }
+  
+  .nav-menu {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--card-bg);
+    display: flex;
+    justify-content: space-around;
+    padding: 0.75rem 0.5rem;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.3);
+    z-index: 1001;
+  }
+  
+  .nav-item {
+    text-align: center;
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: #BBB;
+    transition: color 0.3s;
+  }
+  
+  .nav-item:hover, .nav-item.active {
+    color: var(--accent-color);
+  }
+  
+  .nav-icon {
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  #profile {
+    text-align: center;
+  }
+  
+  .profile-picture-container {
+    margin-bottom: 1rem;
+  }
+  
+  #profilePicture {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+    border: 3px solid var(--accent-color);
+  }
+  
+  #revolution {
+    text-align: center;
+  }
+  
+  #revolutionProgress {
+    width: 100%;
+    height: 20px;
+    background-color: #444;
+    border-radius: 10px;
+    margin: 1rem 0;
+    overflow: hidden;
+  }
+  
+  #revolutionBar {
+    width: 0%;
+    height: 100%;
+    background-color: var(--accent-color);
+    transition: width 0.5s ease-in-out;
+  }
+  
+  .task-list {
+    text-align: left;
+    margin-top: 1rem;
+    font-size: 1.1rem;
+  }
+  
+  .task-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .task-checkbox {
+    margin-right: 0.5rem;
+  }
+
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+  }
+
+  .modal-content {
+    background-color: var(--card-bg);
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid var(--primary-color);
+    width: 80%;
+    max-width: 500px;
+    border-radius: 10px;
+  }
+
+  .modal input, .modal textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid var(--primary-color);
+    background-color: rgba(255,255,255,0.1);
+    color: var(--text-color);
+    border-radius: 5px;
+  }
+
+  .modal button {
+    width: 100%;
+    margin-top: 10px;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+  }
+
+  .modal button:hover {
+    background-color: #B71C1C;
+  }
+
+  .modal p {
+    margin-top: 15px;
+    text-align: center;
+  }
+
+  .modal a {
+    color: var(--primary-color);
+    text-decoration: none;
+  }
+
+  .modal a:hover {
+    text-decoration: underline;
+  }
+
+  .create-council-btn {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    padding: 10px 20px;
+    margin-bottom: 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .create-council-btn:hover {
+    background-color: #B71C1C;
+  }
+
+</style>
+</head>
+<body>
+  <div class="app-container">
+    <header>
+      <h1>Consilio</h1>
+    </header>
+    
+    <main>
+      <div id="map"></div>
+      
+      <div id="councils">
+        <button onclick="showCreateCouncilModal()" class="create-council-btn">Créer un nouveau conseil</button>
+      </div>
+      
+      <div id="chat" class="card">
+        <h2>Chat du conseil</h2>
+        <div id="chatMessages"></div>
+        <input type="text" id="chatInput" placeholder="Votre message..." onkeypress="handleChatInput(event)">
+      </div>
+      
+      <div id="profile">
+        <div class="profile-picture-container">
+          <img id="profilePicture" src="https://example.com/default-avatar.jpg" alt="Photo de profil" width="100" height="100">
+          <input type="file" id="profilePictureInput" accept="image/*" style="display: none;">
+          <button onclick="document.getElementById('profilePictureInput').click()">Changer la photo</button>
+        </div>
+        <h2 id="profileName">Camarade Anonyme</h2>
+        <p id="profileJoinDate">Membre depuis: 01/05/2023</p>
+        <p id="profileCouncils">Conseils rejoints: 0</p>
+        <p id="profileActions">Actions participées: 0</p>
+        <button onclick="editProfile()">Modifier le profil</button>
+        <button onclick="logout()">Se déconnecter</button>
+      </div>
+      
+      <div id="revolution" class="card">
+        <h2>Progrès de la Révolution</h2>
+        <div id="revolutionProgress">
+          <div id="revolutionBar"></div>
+        </div>
+        <p>Progrès: <span id="revolutionPercentage">0</span>%</p>
+        <h3>Tâches révolutionnaires:</h3>
+        <div class="task-list">
+          <div class="task-item">
+            <input type="checkbox" id="task1" class="task-checkbox" onchange="updateRevolution()">
+            <label for="task1">Distribuer des tracts</label>
+          </div>
+          <div class="task-item">
+            <input type="checkbox" id="task2" class="task-checkbox" onchange="updateRevolution()">
+            <label for="task2">Organiser une manifestation</label>
+          </div>
+          <div class="task-item">
+            <input type="checkbox" id="task3" class="task-checkbox" onchange="updateRevolution()">
+            <label for="task3">Créer une coopérative ouvrière</label>
+          </div>
+        </div>
+      </div>
+    </main>
+    
+    <nav class="nav-menu">
+      <div class="nav-item" onclick="showSection('map')">
+        <div class="nav-icon">🗺️</div>
+        Carte
+      </div>
+      <div class="nav-item" onclick="showSection('councils')">
+        <div class="nav-icon">👥</div>
+        Conseils
+      </div>
+      <div class="nav-item" onclick="showSection('chat')">
+        <div class="nav-icon">💬</div>
+        Chat
+      </div>
+      <div class="nav-item" onclick="showSection('profile')">
+        <div class="nav-icon">👤</div>
+        Profil
+      </div>
+      <div class="nav-item" onclick="showSection('revolution')">
+        <div class="nav-icon">✊</div>
+        Révolution
+      </div>
+    </nav>
+  </div>
+
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <h2>Rejoindre la Révolution</h2>
+      <form id="loginForm">
+        <input type="text" id="username" placeholder="Nom de camarade" required>
+        <input type="password" id="password" placeholder="Mot de passe révolutionnaire" required>
+        <button type="submit">Rejoindre le mouvement</button>
+      </form>
+      <p>Pas encore un camarade? <a href="#" id="showSignup">S'enregistrer</a></p>
+    </div>
+  </div>
+
+  <div id="signupModal" class="modal">
+    <div class="modal-content">
+      <h2>Devenir un Camarade</h2>
+      <form id="signupForm">
+        <input type="text" id="newUsername" placeholder="Nom de camarade" required>
+        <input type="password" id="newPassword" placeholder="Mot de passe révolutionnaire" required>
+        <input type="email" id="email" placeholder="Email du prolétariat" required>
+        <button type="submit">Rejoindre la lutte</button>
+      </form>
+      <p>Déjà un camarade? <a href="#" id="showLogin">Se connecter</a></p>
+    </div>
+  </div>
+
+  <div id="createCouncilModal" class="modal">
+    <div class="modal-content">
+      <h2>Créer un nouveau conseil</h2>
+      <form id="createCouncilForm">
+        <input type="text" id="councilName" placeholder="Nom du conseil" required>
+        <input type="text" id="councilLocation" placeholder="Lieu (ex: Paris, 5e arr.)" required>
+        <textarea id="councilDescription" placeholder="Description du conseil" required></textarea>
+        <button type="submit">Créer le conseil</button>
+      </form>
+    </div>
+  </div>
+  
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  
+  <script>
+    let map;
+    let currentSection = 'map';
+    let councils = [
+      { name: 'Quartier Rouge', lat: 48.8566, lng: 2.3522, members: 42, nextMeeting: 'Aujourd\'hui 19h00' },
+      { name: 'Révolution Prolétarienne', lat: 48.8606, lng: 2.3376, members: 189, currentVote: 'Planification économique' }
+    ];
+    let currentUser = null;
+    let socket;
+
+    document.addEventListener('DOMContentLoaded', initializeApp);
+
+    function initializeApp() {
+      initMap();
+      showSection('map');
+      loadChatHistory();
+      updateRevolutionProgress();
+      showLoginModal();
+
+      socket = new WebSocket('ws://localhost:8080');
+
+      socket.onopen = function(event) {
+        console.log('WebSocket connection established');
+      };
+
+      socket.onmessage = function(event) {
+        const message = JSON.parse(event.data);
+        displayMessage(message.sender, message.text);
+      };
+
+      socket.onerror = function(error) {
+        console.error('WebSocket error:', error);
+      };
+
+      socket.onclose = function(event) {
+        console.log('WebSocket connection closed');
+      };
+    }
+
+    function showSection(sectionId) {
+      const sections = ['map', 'councils', 'chat', 'profile', 'revolution'];
+      sections.forEach(section => {
+        document.getElementById(section).style.display = section === sectionId ? 'block' : 'none';
+      });
+      currentSection = sectionId;
+
+      const navItems = document.querySelectorAll('.nav-item');
+      navItems.forEach(item => {
+        item.classList.remove('active');
+        if (item.textContent.trim().toLowerCase() === sectionId) {
+          item.classList.add('active');
+        }
+      });
+
+      if (sectionId === 'map') {
+        document.getElementById('map').style.height = (window.innerHeight - 50) + 'px';
+        if (map) {
+          map.invalidateSize();
+        }
+      }
+
+      // Make sure chat messages are visible when the chat section is shown
+      if (sectionId === 'chat') {
+        const chatMessages = document.getElementById('chatMessages');
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+    }
+
+    function initMap() {
+      map = L.map('map').setView([48.8566, 2.3522], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      councils.forEach(council => {
+        L.marker([council.lat, council.lng]).addTo(map)
+          .bindPopup(`<b>${council.name}</b><br>Membres: ${council.members}`)
+          .on('click', () => showCouncilDetails(council));
+      });
+    }
+
+    function showCouncilDetails(council) {
+      alert(`
+        Nom: ${council.name}
+        Membres: ${council.members}
+        ${council.nextMeeting ? 'Prochaine réunion: ' + council.nextMeeting : ''}
+        ${council.currentVote ? 'Vote en cours: ' + council.currentVote : ''}
+      `);
+    }
+
+    function handleChatInput(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        const message = event.target.value;
+        if (moderateMessage(message)) {
+          sendMessage(message);
+          event.target.value = '';
+        } else {
+          alert("Message bloqué par l'auto-modération. Veuillez respecter nos principes révolutionnaires.");
+        }
+      }
+    }
+
+    function sendMessage(message) {
+      if (socket.readyState === WebSocket.OPEN) {
+        const messageObj = {
+          sender: currentUser ? currentUser.username : 'Anonyme',
+          text: message
+        };
+        socket.send(JSON.stringify(messageObj));
+        displayMessage(messageObj.sender, messageObj.text);
+      } else {
+        console.error('WebSocket is not open. Message not sent.');
+        // Fallback: display the message locally if WebSocket is not open
+        displayMessage(currentUser ? currentUser.username : 'Anonyme', message);
+      }
+    }
+
+    function displayMessage(sender, text) {
+      const chatMessages = document.getElementById('chatMessages');
+      const newMessage = document.createElement('p');
+      newMessage.innerHTML = `<strong>${sender}:</strong> ${text}`;
+      chatMessages.appendChild(newMessage);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function moderateMessage(message) {
+      const bannedWords = ['capitalisme', 'propriété privée', 'exploitation'];
+      return !bannedWords.some(word => message.toLowerCase().includes(word));
+    }
+
+    function loadChatHistory() {
+      const chatMessages = document.getElementById('chatMessages');
+      const history = [
+        { sender: 'Marx', message: 'Camarades, unissons-nous pour la révolution!' },
+        { sender: 'Engels', message: 'Oui, le prolétariat doit s\'organiser.' },
+        { sender: 'Lénine', message: 'Que proposez-vous comme action concrète ?' }
+      ];
+      
+      history.forEach(msg => {
+        const msgElement = document.createElement('p');
+        msgElement.innerHTML = `<strong>${msg.sender}:</strong> ${msg.message}`;
+        chatMessages.appendChild(msgElement);
+      });
+    }
+
+    function createCouncil(name, location, description) {
+      if (!currentUser) {
+        alert('Vous devez être connecté pour créer un conseil.');
+        return;
+      }
+      
+      const newCouncil = {
+        name: name,
+        lat: 48.8566 + (Math.random() - 0.5) * 0.1,
+        lng: 2.3522 + (Math.random() - 0.5) * 0.1,
+        members: 1,
+        description: description,
+        founder: currentUser.username
+      };
+      
+      councils.push(newCouncil);
+      
+      L.marker([newCouncil.lat, newCouncil.lng]).addTo(map)
+        .bindPopup(`<b>${newCouncil.name}</b><br>Membres: ${newCouncil.members}`)
+        .on('click', () => showCouncilDetails(newCouncil));
+      
+      updateCouncilsList();
+      
+      alert('Conseil créé avec succès !');
+    }
+
+    function updateCouncilsList() {
+      const councilsContainer = document.getElementById('councils');
+      councilsContainer.innerHTML = '';
+      
+      councils.forEach(council => {
+        const councilCard = document.createElement('div');
+        councilCard.className = 'card council-card';
+        councilCard.innerHTML = `
+          <h2>${council.name}</h2>
+          <div class="council-info">
+            <span>Membres: ${council.members}</span>
+            <span>Fondateur: ${council.founder || 'Inconnu'}</span>
+          </div>
+          <p>${council.description || 'Aucune description'}</p>
+          <div class="action-buttons">
+            <button onclick="joinCouncil('${council.name}')">Rejoindre</button>
+            <button onclick="showDetails('${council.name}')">Détails</button>
+          </div>
+        `;
+        councilsContainer.appendChild(councilCard);
+      });
+    }
+
+    document.getElementById('createCouncilForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('councilName').value;
+      const location = document.getElementById('councilLocation').value;
+      const description = document.getElementById('councilDescription').value;
+      createCouncil(name, location, description);
+      hideModals();
+    });
+
+    function showCreateCouncilModal() {
+      document.getElementById('createCouncilModal').style.display = 'block';
+    }
+
+    function hideModals() {
+      document.getElementById('loginModal').style.display = 'none';
+      document.getElementById('signupModal').style.display = 'none';
+      document.getElementById('createCouncilModal').style.display = 'none';
+    }
+
+    function joinCouncil(councilName) {
+      alert(`Vous avez rejoint le conseil: ${councilName}`);
+      if (currentUser) {
+        currentUser.councilsJoined++;
+        localStorage.setItem(currentUser.username, JSON.stringify(currentUser));
+      }
+      updateProfile();
+    }
+
+    function showDetails(councilName) {
+      const council = councils.find(c => c.name === councilName);
+      showCouncilDetails(council);
+    }
+
+    function joinDiscussion(councilName) {
+      alert(`Vous participez maintenant à la discussion sur ${councilName}`);
+      showSection('chat');
+    }
+
+    function voteNow(topic) {
+      const vote = confirm(`Voulez-vous voter pour la ${topic} ?`);
+      if (vote) {
+        alert(`Vote enregistré pour la ${topic}`);
+        if (currentUser) {
+          currentUser.actionsParticipated++;
+          localStorage.setItem(currentUser.username, JSON.stringify(currentUser));
+        }
+        updateProfile();
+      } else {
+        alert('Vote annulé');
+      }
+    }
+
+    function logout() {
+      currentUser = null;
+      updateProfile();
+      showLoginModal();
+    }
+
+    function updateProfile() {
+      if (currentUser) {
+        document.getElementById('profileName').textContent = currentUser.username;
+        document.getElementById('profileJoinDate').textContent = `Membre depuis: ${currentUser.joinDate}`;
+        document.getElementById('profileCouncils').textContent = `Conseils rejoints: ${currentUser.councilsJoined}`;
+        document.getElementById('profileActions').textContent = `Actions participées: ${currentUser.actionsParticipated}`;
+      } else {
+        document.getElementById('profileName').textContent = 'Camarade Anonyme';
+        document.getElementById('profileJoinDate').textContent = 'Membre depuis: -';
+        document.getElementById('profileCouncils').textContent = 'Conseils rejoints: 0';
+        document.getElementById('profileActions').textContent = 'Actions participées: 0';
+      }
+    }
+
+    function editProfile() {
+      if (currentUser) {
+        const newUsername = prompt("Entrez votre nouveau nom de camarade:", currentUser.username);
+        if (newUsername) {
+          currentUser.username = newUsername;
+          localStorage.setItem(currentUser.username, JSON.stringify(currentUser));
+          updateProfile();
+        }
+      } else {
+        alert('Veuillez vous connecter pour modifier votre profil.');
+        showLoginModal();
+      }
+    }
+
+    function showLoginModal() {
+      document.getElementById('loginModal').style.display = 'block';
+    }
+
+    function showSignupModal() {
+      document.getElementById('signupModal').style.display = 'block';
+    }
+
+    function hideModals() {
+      document.getElementById('loginModal').style.display = 'none';
+      document.getElementById('signupModal').style.display = 'none';
+      document.getElementById('createCouncilModal').style.display = 'none';
+    }
+
+    function login(username, password) {
+      const storedUser = JSON.parse(localStorage.getItem(username));
+      if (storedUser && storedUser.password === password) {
+        currentUser = storedUser;
+        updateProfile();
+        hideModals();
+        alert('Connexion réussie !');
+      } else {
+        alert('Nom d\'utilisateur ou mot de passe incorrect.');
+      }
+    }
+
+    function signup(username, password, email) {
+      const newUser = {
+        username,
+        password,
+        email,
+        joinDate: new Date().toLocaleDateString(),
+        councilsJoined: 0,
+        actionsParticipated: 0
+      };
+      localStorage.setItem(username, JSON.stringify(newUser));
+      currentUser = newUser;
+      updateProfile();
+      hideModals();
+      alert('Compte créé avec succès !');
+    }
+
+    function updateRevolutionProgress() {
+      const tasks = document.querySelectorAll('.task-checkbox');
+      const completedTasks = Array.from(tasks).filter(task => task.checked).length;
+      const progress = Math.round((completedTasks / tasks.length) * 100);
+      
+      document.getElementById('revolutionBar').style.width = `${progress}%`;
+      document.getElementById('revolutionPercentage').textContent = progress;
+    }
+
+    function updateRevolution() {
+      updateRevolutionProgress();
+      
+      const progress = parseInt(document.getElementById('revolutionPercentage').textContent);
+      if (progress === 100) {
+        alert("Félicitations, camarade ! La révolution est accomplie ! Le pouvoir est maintenant entre les mains du prolétariat !");
+      } else if (progress >= 50) {
+        alert("La révolution avance bien, camarade ! Continuons la lutte !");
+      }
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      login(username, password);
+    });
+
+    document.getElementById('signupForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const username = document.getElementById('newUsername').value;
+      const password = document.getElementById('newPassword').value;
+      const email = document.getElementById('email').value;
+      signup(username, password, email);
+    });
+
+    document.getElementById('showSignup').addEventListener('click', function(e) {
+      e.preventDefault();
+      hideModals();
+      showSignupModal();
+    });
+
+    document.getElementById('showLogin').addEventListener('click', function(e) {
+      e.preventDefault();
+      hideModals();
+      showLoginModal();
+    });
+
+    document.getElementById('profilePictureInput').addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('profilePicture').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    window.addEventListener('orientationchange', function() {
+      if (currentSection === 'map') {
+        setTimeout(() => {
+          document.getElementById('map').style.height = (window.innerHeight - 50) + 'px';
+          map.invalidateSize();
+        }, 200);
+      }
+    });
+
+    window.addEventListener('resize', function() {
+      if (currentSection === 'map') {
+        document.getElementById('map').style.height = (window.innerHeight - 50) + 'px';
+        map.invalidateSize();
+      }
+    });
+  </script>
+</body>
+</html>
